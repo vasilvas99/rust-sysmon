@@ -34,7 +34,7 @@ async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
 
 pub async fn check_net_device(net_dev_id: &str) -> Result<MonitorResults> {
     let output = execute_cmd(&format!("ip address | grep \": {}:\"", net_dev_id)).await?;
-    let mut s_name = String::from("Check netdev: ");
+    let mut s_name = String::from("Check netdev exists: ");
     s_name.push_str(net_dev_id);
     let res = if output.stdout.len() != 0 {
         MonitorResults {
