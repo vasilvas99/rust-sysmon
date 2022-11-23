@@ -1,7 +1,6 @@
 use tokio::process::Command;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-
 #[derive(Debug)]
 pub struct MonitorResults {
     pub service_name: String,
@@ -12,7 +11,7 @@ pub struct MonitorResults {
 pub struct ParsedConsoleOutput {
     pub stdout: String,
     pub stderr: String,
-    pub exit_code: i32
+    pub exit_code: i32,
 }
 
 async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
@@ -24,10 +23,10 @@ async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
 
     let exit_code = c.status.code().ok_or("Service killed by SIG")?;
 
-    let out = ParsedConsoleOutput{
+    let out = ParsedConsoleOutput {
         stdout: String::from_utf8_lossy(&c.stdout).trim().to_string(),
         stderr: String::from_utf8_lossy(&c.stderr).trim().to_string(),
-        exit_code
+        exit_code,
     };
 
     Ok(out)
@@ -35,19 +34,19 @@ async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
 
 pub async fn check_net_device(net_dev_id: &str) -> Result<MonitorResults> {
     let output = execute_cmd(&format!("ip address | grep \": {}:\"", net_dev_id)).await?;
-    let mut s_name = String::from("NetDev ");
+    let mut s_name = String::from("Check netdev: ");
     s_name.push_str(net_dev_id);
     let res = if output.stdout.len() != 0 {
         MonitorResults {
             service_name: s_name,
             is_good: true,
-            message: output.stdout,
+            message: format!("Device {} found", net_dev_id),
         }
     } else {
         MonitorResults {
             service_name: s_name,
             is_good: false,
-            message: output.stderr,
+            message: format!("Device {} not found", net_dev_id),
         }
     };
 
