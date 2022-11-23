@@ -22,7 +22,7 @@ async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
         .output()
         .await?;
 
-    let exit_code = c.status.code().unwrap(); // fix
+    let exit_code = c.status.code().ok_or("Service killed by SIG")?;
 
     let out = ParsedConsoleOutput{
         stdout: String::from_utf8_lossy(&c.stdout).trim().to_string(),
