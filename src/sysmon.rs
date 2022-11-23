@@ -1,7 +1,6 @@
 use tokio::process::Command;
 pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-const  KILLED_BY_SIGNAL_STATUS: i32 = -10000;
 
 #[derive(Debug)]
 pub struct MonitorResults {
@@ -23,10 +22,7 @@ async fn execute_cmd(cmd: &str) -> Result<ParsedConsoleOutput> {
         .output()
         .await?;
 
-    let exit_code = match c.status.code() {
-        Some(c) => c,
-        None => KILLED_BY_SIGNAL_STATUS
-    };
+    let exit_code = c.status.code().unwrap(); // fix
 
     let out = ParsedConsoleOutput{
         stdout: String::from_utf8_lossy(&c.stdout).trim().to_string(),
